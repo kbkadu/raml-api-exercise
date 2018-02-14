@@ -1,0 +1,19 @@
+#%RAML 1.0 Trait
+
+usage: Common query parameter for indicating time period
+
+description: Provides query parameters used be used for <<purpose>>
+
+queryParameters:
+  fromDateTime:
+    type: datetime
+    format: rfc3339
+    displayName: From timestamp in rfc3339 format
+    description: From timestamp for <<purpose>>
+    example: "2016-02-28T16:41:41.090Z"
+  toDateTime:
+    type: datetime
+    format: rfc3339
+    displayName: To timestamp in rfc3339 format
+    description: To timestamp for <<purpose>>
+    example: "2016-02-28T16:41:41.090Z"
