@@ -1,4 +1,4 @@
-# RAML API Models As An Exercise Around Customer API
+# RAML API Modelling Exercise
 This repository contains the RAMLs for Customer APIs. These APIs are designed using APILed Connectivity Pattern to meet objectives as follows.
 
 ## Objective
