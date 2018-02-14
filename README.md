@@ -97,11 +97,11 @@ The Experience API also offer a PATCH "/customer/{id}/{fieldName}" for Mobile ap
 
 Orders and Products resource will be incorporated into the Experience API with two main functional context
 * Create/Get Order history for a particular customer, Get Product recommendations/wishList for particular customer.
-The Experience API cloud have resource like "/customers/{id}/orders" with necessary filters to retrieve Order of particular Customer. Such capability need to be supported by underline Order System API which could interface with the Order Management System.
+The Experience API cloud have resource like "/customers/{id}/orders" with necessary filters to retrieve Order of particular Customer. Such capability need to be supported by underline Order Process and System API which could interface with the Order Management System.
 For Products "/customers/{id}/products/wishList" and "/customers/{id}/products/recommendations" can retrieve Product. These capability will come from the Recommendations process API.
 
 * Get Product
-Experience API can also have GET "/products" resource to get available Products
+Experience API can also have GET "/products" resource to get available Products using Product System API.
 
 ## Further Improvements
 ### Add pagination
@@ -109,3 +109,4 @@ The GET "customers" even with period cloud return large list of Customer records
 
 ### Single Experience API
 For all the above use cases we have assume that is a same API consumer and thus designed single Experience API. But separate Experience API for each consumer can enable faster rate of change than having a common Experience API between multiple API consumer.
+
