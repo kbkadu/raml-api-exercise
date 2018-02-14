@@ -1,0 +1,20 @@
+#%RAML 1.0 ResourceType
+
+usage: Common resource type representing collection of resources with get and create operation.
+   
+get:
+  displayName: Returns list of <<collectionType>>
+  description: Resource returns the list of <<collectionType>> using given param.
+  responses:
+    200:
+      body:
+        application/json:
+          type: array
+          items: <<collectionItem>>
+          minItems: 0
+post:
+  displayName: Creates a new <<collectionItem>> in <<collectionType>>
+  description: Creates a new <<collectionItem>> in <<collectionType>>
+  body:
+    application/json:
+      type: <<collectionItem>>

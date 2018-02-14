@@ -1,0 +1,28 @@
+#%RAML 1.0 Trait
+
+usage: Common Response type for create new resource operation
+
+uses:
+  responseTypes: ../libraries/ResponseTypes.raml
+
+responses:
+  201:
+    body:
+      application/json:
+        type: responseTypes.CreateResourceResType
+    description: Created new resource
+  400:
+    body:
+      application/json:
+        type: responseTypes.ErrorResponseType
+    description: Invalid input data
+  401:
+    body:
+      application/json:
+        type: responseTypes.ErrorType
+    description: Unathorize action
+  403:
+    body:
+      application/json:
+        type: responseTypes.ErrorType
+    description: Forbidden action

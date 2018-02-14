@@ -1,0 +1,85 @@
+#%RAML 1.0
+baseUri: https://mocksvc.mulesoft.com/mocks/f3ac9397-f550-4f00-b9f3-88190468b0c5 #
+title: Customer Experience API
+version: 1.0
+
+protocols: [HTTPS]
+
+securedBy: oauth2.0
+
+description: |
+  This is a Experience API for interacting with Customer's information in System Of Records. The API provides necessary RESTful resource which allows required actions on Customer information.
+
+securitySchemes:
+  oauth2.0: !include ./securitySchemes/OAuth2.0Scheme.raml
+
+resourceTypes:
+  mutableCollection: !include resourceTypes/MutableCollection.raml
+  mutableResource: !include resourceTypes/MutableResource.raml
+  immutableCollection: !include resourceTypes/ImmutableCollection.raml
+
+traits:
+  hasTimePeriodFilter: !include traits/TimePeriodParams.raml
+  useCreateResourceResponse: !include traits/CreateResourceResponse.raml
+  useUpdateResourceResponse: !include traits/UpdateResourceResponse.raml
+  useDeleteResourceResponse: !include traits/DeleteResourceResponse.raml
+  hasStatusFilter: !include ./traits/StatusFilter.raml
+
+types:
+  customerType: !include dataTypes/CustomerType.raml
+  updateCustomerType: !include dataTypes/UpdateCustomerType.raml
+  orderSummaryType: !include dataTypes/OrderSummaryType.raml
+  orderType: !include dataTypes/OrderType.raml
+  productSummaryType: !include dataTypes/ProductSummaryType.raml
+
+/customers:
+  displayName: Customers
+  description: Resource which identifies Customer information in System Of Records and provides various operations for managing this information.
+  type:  { immutableCollection: {collectionType : Customer records, collectionItem : customerType } }
+  get:
+    is: [hasTimePeriodFilter: {purpose : searching last updated Customers }]
+
+  /updatedInlast5min:
+    type:  { immutableCollection: {collectionType : Customer Records Updated in last 5 min, collectionItem : customerType } }
+
+  /{id}:
+    uriParameters:
+      id:
+        type: string
+        displayName: Unique Id
+        description: An Id which uniquely identifies Customer record in System Of Records
+    type: { mutableResource: {resourceItem: Customer, getJsonType: customerType, putJsonType: updateCustomerType }}
+    put:
+      is: [useUpdateResourceResponse]
+
+    /{fieldName}:
+      uriParameters:
+        fieldName:
+          enum: [
+          firstName,
+          lastName,
+          street,
+          city,
+          state,
+          postalCode
+          ]
+      patch:
+        is: [useUpdateResourceResponse]
+        body:
+          application/json:
+            type: object
+            properties:
+              value: string
+
+    /orders:
+      type:  { mutableCollection: {collectionType : Customer Orders, collectionItem : orderSummaryType, getJsonType: orderSummaryType, postJsonType: orderType} }
+      get:
+        is: [hasTimePeriodFilter: {purpose : searching Customer's Orders }, hasStatusFilter: {purpose: searching Order, statusParamName: orderStatus, isRequired: true}]
+
+    /products:
+      /wishList:
+        type:  { immutableCollection: {collectionType : Products from Wishlist, collectionItem : productSummaryType } }
+      /recommendations:
+        type:  { immutableCollection: {collectionType : Products based on recommendation, collectionItem : productSummaryType } }
+/products:
+  type:  { immutableCollection: {collectionType : Available Products, collectionItem : productSummaryType } }

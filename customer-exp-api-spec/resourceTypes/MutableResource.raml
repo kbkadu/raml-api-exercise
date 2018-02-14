@@ -1,0 +1,18 @@
+#%RAML 1.0 ResourceType
+
+usage: Common resource type representing a resources with get and update operation.
+
+get:
+  displayName: Get <<resourceItem>>
+  description: Retrieves the <<resourceItem>> using unique id.
+  responses:
+    200:
+      body:
+        application/json:
+          type: <<getJsonType>>
+put:
+  displayName: Update <<resourceItem>>
+  description: Update the <<resourceItem>> using unique id.
+  body:
+    application/json:
+      type:  <<putJsonType>>  

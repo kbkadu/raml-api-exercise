@@ -1,0 +1,102 @@
+#%RAML 1.0 DataType
+
+displayName: Customer
+description: Definition of the Customer Object
+
+uses:
+  isoCountryCodes: ../libraries/ISO3166-1CountryCodesTypes.raml
+
+type: object
+properties:
+  id:
+    type: string
+    required: true
+    displayName: UniqueId
+    description: Unique identifier for Customer record
+  nameDetails:
+    type: object
+    required: false
+    displayName: Name Details
+    description: Customer name information
+    properties:
+      salutation:
+        type: string
+        displayName: Salutation
+        description: Salutation of the person
+        required: false
+      prefix:
+        type: string
+        displayName: Prefix
+        description: Name prefix of the person
+        required: false
+      firstName:
+        type: string
+        displayName: First Name
+        description: First name of the person
+        required: false
+      middleName:
+        type: string
+        displayName: Middle Name
+        description: Middle name of the person
+        required: false
+      lastName:
+        type: string
+        displayName: Last Name
+        description: Last name of the person
+        required: false
+  addressDetails:
+    type: object
+    required: false
+    displayName: Address Details
+    description: Customer address information
+    properties:
+      addressLine1:
+        type: string
+        displayName: Address Line 1
+        description: Field indicating street address
+        required: false
+      addressLine2:
+        type: string
+        displayName: Address Line 2
+        description: Field for additional information about address
+        required: false
+      addressLine3:
+        type: string
+        displayName: Address Line 3
+        description: Field for additional information about address
+        required: false
+      addressLine4:
+        type: string
+        displayName: Address Line 4
+        description: Field for additional information about address
+        required: false
+      addressLine5:
+        type: string
+        displayName: Address Line 5
+        description: Field for additional information about address
+        required: false
+      cityDivision:
+        type: string
+        displayName: City Division
+        description: Filed indicating Sub division / area of the City
+        required: false
+      city:
+        type: string
+        displayName: City
+        description: City of the address
+        required: false
+      state:
+        type: string
+        displayName: State
+        description: State of the address
+        required: false
+      postalCode:
+        type: string
+        displayName: Postal Code
+        description: Postal code of the address
+        required: false
+      country:
+        type: isoCountryCodes.ISO3166-1Alpha2Codes
+        displayName: Country Code
+        description: Country of the address
+        required: false

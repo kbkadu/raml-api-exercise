@@ -1,0 +1,48 @@
+#%RAML 1.0
+baseUri: https://mocksvc.mulesoft.com/mocks/f3ac9397-f550-4f00-b9f3-88190468b0c5 #
+title: Customer System API
+version: 1.0
+protocols: [HTTPS]
+
+securedBy: oauth2.0
+
+description: |
+  This is a System API for interacting with Customer's information in System Of Records. The API provides necessary RESTful resource which allows required actions on Customer information.
+
+securitySchemes:
+  oauth2.0: !include ./securitySchemes/OAuth2.0Scheme.raml
+
+resourceTypes:
+  mutableCollection: !include resourceTypes/MutableCollection.raml
+  mutableResource: !include resourceTypes/MutableResource.raml
+  immutableCollection: !include resourceTypes/ImmutableCollection.raml
+
+traits:
+  hasTimePeriodFilter: !include traits/TimePeriodParams.raml
+  useCreateResourceResponse: !include traits/CreateResourceResponse.raml
+  useUpdateResourceResponse: !include traits/UpdateResourceResponse.raml
+  useDeleteResourceResponse: !include traits/DeleteResourceResponse.raml
+
+types:
+  customerType: !include dataTypes/CustomerType.raml
+  updateCustomerType: !include dataTypes/UpdateCustomerType.raml
+
+/customers:
+  displayName: Customers
+  description: Resource which identifies Customer information in System Of Records and provides various operations for managing this information.
+  type:  { mutableCollection: {collectionType : Customer records, collectionItem : customerType } }
+  get:
+    is: [hasTimePeriodFilter: {purpose : searching last updated Customers }]
+  post:
+    is: [useCreateResourceResponse]
+  /{id}:
+    uriParameters:
+      id:
+        type: string
+        displayName: Unique Id
+        description: An Id which uniquely identifies Customer record in System Of Records
+    type: { mutableResource: {resourceItem: Customer, getJsonType: customerType, putJsonType: updateCustomerType}}
+    put:
+      is: [useUpdateResourceResponse]
+    delete:
+      is: [useDeleteResourceResponse]
