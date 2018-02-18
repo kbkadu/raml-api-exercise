@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:mock="http://www.mulesoft.org/schema/mule/mock"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:core="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/mock http://www.mulesoft.org/schema/mule/mock/current/mule-mock.xsd
+http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+    <munit:config name="munit" doc:name="MUnit configuration"/>
+    <spring:beans>
+        <spring:import resource="classpath:customer-sys-api-impl.xml"/>
+        <spring:import resource="classpath:inmem-customer-sor-provider.xml"/>
+        <spring:import resource="classpath:common-exception-strategies.xml"/>                
+        <spring:import resource="classpath:common-config.xml"/>
+    </spring:beans>
+    <munit:test name="customer-sys-api-impl-test-suite-put:/customers/{id}:application:implTest" description="Test">
+        <mock:when doc:name="Mock:ConnectorOperation:UpdateCustomers" messageProcessor=".*:.*">
+            <mock:with-attributes>
+                <mock:with-attribute name="name" whereValue="ConnectorOperation:UpdateCustomers"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[{ &quot;id&quot;: &quot;1&quot; }]" mimeType="application/java"/>
+        </mock:when>
+        <munit:set payload="{ &quot;nameDetails&quot;: { &quot;salutation&quot;: &quot;Mr&quot; } }" mimeType="application/json" doc:name="SetMessage:SetInput">
+            <munit:invocation-properties>
+                <munit:invocation-property key="id" value="&quot;1&quot;" mimeType="application/java"/>
+            </munit:invocation-properties>
+        </munit:set>
+        <flow-ref name="put:/customers/{id}:application:impl" doc:name="Flow-ref to put:/customers/{id}:application:impl"/>
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload resource="classpath:dwl/ConvertToJava.dwl"/>
+        </dw:transform-message>
+        <munit:assert-on-equals expectedValue="1" actualValue="#[payload.uniqueId]" doc:name="Assert Equals"/>
+    </munit:test>
+
+    <munit:test name="customer-sys-api-impl-test-suite-put:/customers/{id}:application:implErrorTest" description="Test">
+        <mock:when doc:name="Mock:ConnectorOperation:UpdateCustomers" messageProcessor=".*:.*">
+            <mock:with-attributes>
+                <mock:with-attribute name="name" whereValue="ConnectorOperation:UpdateCustomers"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[NullPayload.getInstance()]" mimeType="application/java"/>
+        </mock:when>
+        <munit:set payload="{ &quot;nameDetails&quot;: { &quot;salutation&quot;: &quot;Mr&quot; } }" mimeType="application/json" doc:name="SetMessage:SetInput">
+            <munit:invocation-properties>
+                <munit:invocation-property key="id" value="&quot;1&quot;" mimeType="application/java"/>
+            </munit:invocation-properties>
+        </munit:set>
+        <flow-ref name="put:/customers/{id}:application:impl" doc:name="Flow-ref to put:/customers/{id}:application:impl"/>
+        <munit:assert-on-equals expectedValue="404" actualValue="#[message.outboundProperties['http.status']]" doc:name="Assert Equals"/>
+    </munit:test>
+
+    <munit:test name="customer-sys-api-impl-test-suite-delete:/customers/{id}:implTest" description="Test">
+        <mock:when doc:name="Mock:ConnectorOperation:DeleteCustomer" messageProcessor=".*:.*">
+            <mock:with-attributes>
+                <mock:with-attribute name="name" whereValue="ConnectorOperation:DeleteCustomer"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[{ &quot;id&quot;: &quot;1&quot; }]" mimeType="application/java"/>
+        </mock:when>
+        <munit:set payload="#[NullPayload.getInstance()]" mimeType="application/json" doc:name="SetMessage:SetInput">
+            <munit:invocation-properties>
+                <munit:invocation-property key="id" value="&quot;1&quot;" mimeType="application/java"/>
+            </munit:invocation-properties>
+        </munit:set>
+        <flow-ref name="delete:/customers/{id}:impl" doc:name="Flow-ref to delete:/customers/{id}:impl"/>
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload resource="classpath:dwl/ConvertToJava.dwl"/>
+        </dw:transform-message>
+        <munit:assert-on-equals expectedValue="1" actualValue="#[payload.uniqueId]" doc:name="Assert Equals"/>
+    </munit:test>
+
+    <munit:test name="customer-sys-api-impl-test-suite-delete:/customers/{id}:implErrorTest" description="Test">
+        <mock:when doc:name="Mock:ConnectorOperation:DeleteCustomer" messageProcessor=".*:.*">
+            <mock:with-attributes>
+                <mock:with-attribute name="name" whereValue="ConnectorOperation:DeleteCustomer"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[NullPayload.getInstance()]" mimeType="application/java"/>
+        </mock:when>
+        <munit:set payload="#[NullPayload.getInstance()]" mimeType="application/json" doc:name="SetMessage:SetInput">
+            <munit:invocation-properties>
+                <munit:invocation-property key="id" value="&quot;1&quot;" mimeType="application/java"/>
+            </munit:invocation-properties>
+        </munit:set>
+        <flow-ref name="delete:/customers/{id}:impl" doc:name="Flow-ref to delete:/customers/{id}:impl"/>
+        <munit:assert-on-equals expectedValue="404" actualValue="#[message.outboundProperties['http.status']]" doc:name="Assert Equals"/>
+    </munit:test>
+    
+    <munit:test name="customer-sys-api-impl-test-suite-get:/customers/{id}:implTest" description="Test">
+        <mock:when doc:name="Mock:ConnectorOperation:GetCustomers" messageProcessor=".*:.*">
+            <mock:with-attributes>
+                <mock:with-attribute name="name" whereValue="ConnectorOperation:GetCustomers"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[{ &quot;id&quot;: &quot;1&quot; }]" mimeType="application/java"/>
+        </mock:when>
+        <munit:set payload="#[NullPayload.getInstance()]" mimeType="application/json" doc:name="SetMessage:SetInput">
+            <munit:invocation-properties>
+                <munit:invocation-property key="id" value="&quot;1&quot;" mimeType="application/java"/>
+            </munit:invocation-properties>
+        </munit:set>
+        <flow-ref name="get:/customers/{id}:impl" doc:name="Flow-ref to get:/customers/{id}:impl"/>
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload resource="classpath:dwl/ConvertToJava.dwl"/>
+        </dw:transform-message>
+        <munit:assert-on-equals expectedValue="1" actualValue="#[payload.id]" doc:name="Assert Equals"/>
+    </munit:test>
+    
+     <munit:test name="customer-sys-api-impl-test-suite-get:/customers/{id}:implErrorTest" description="Test">
+        <mock:when doc:name="Mock:ConnectorOperation:GetCustomers" messageProcessor=".*:.*">
+            <mock:with-attributes>
+                <mock:with-attribute name="name" whereValue="ConnectorOperation:GetCustomers"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[NullPayload.getInstance()]" mimeType="application/java"/>
+        </mock:when>
+        <munit:set payload="#[NullPayload.getInstance()]" mimeType="application/json" doc:name="SetMessage:SetInput">
+            <munit:invocation-properties>
+                <munit:invocation-property key="id" value="&quot;1&quot;" mimeType="application/java"/>
+            </munit:invocation-properties>
+        </munit:set>
+        <flow-ref name="get:/customers/{id}:impl" doc:name="Flow-ref to get:/customers/{id}:impl"/>
+        <munit:assert-on-equals expectedValue="404" actualValue="#[message.outboundProperties['http.status']]" doc:name="Assert Equals"/>
+    </munit:test>   
+    
+    <munit:test name="customer-sys-api-impl-test-suite-get:/customers:implTest" description="Test">
+        <mock:when doc:name="Mock:ConnectorOperation:GetCustomers" messageProcessor=".*:.*">
+            <mock:with-attributes>
+                <mock:with-attribute name="name" whereValue="ConnectorOperation:GetCustomers"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[[{ &quot;id&quot;: &quot;1&quot; }, { &quot;id&quot;: &quot;2&quot; }]]" mimeType="application/java"/>
+        </mock:when>
+        <flow-ref name="get:/customers:impl" doc:name="Flow-ref to get:/customers:impl"/>
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload resource="classpath:dwl/ConvertToJava.dwl"/>
+        </dw:transform-message>
+        <munit:assert-on-equals expectedValue="2" actualValue="#[payload.size().toString()]" doc:name="Assert Equals"/>
+    </munit:test>
+    
+    <munit:test name="customer-sys-api-impl-test-suite-post:/customers:application:implTest" description="Test">
+        <mock:when doc:name="Mock:ConnectorOperation:CreateCustomer" messageProcessor=".*:.*">
+            <mock:with-attributes>
+                <mock:with-attribute name="name" whereValue="ConnectorOperation:CreateCustomer"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[{ &quot;id&quot;: &quot;1&quot; }]" mimeType="application/java"/>
+        </mock:when>
+        <munit:set payload="{ &quot;nameDetails&quot;: { &quot;salutation&quot;: &quot;Mr&quot; } }" mimeType="application/json" doc:name="SetMessage:SetInput">
+        </munit:set>
+        <flow-ref name="post:/customers:application:impl" doc:name="Flow-ref to post:/customers:application:impl"/>
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload resource="classpath:dwl/ConvertToJava.dwl"/>
+        </dw:transform-message>
+        <munit:assert-on-equals expectedValue="1" actualValue="#[payload.uniqueId]" doc:name="Assert Equals"/>
+    </munit:test>
+
+    <munit:test name="customer-sys-api-impl-test-suite-post:/customers:application:implErrorTest" description="Test">
+        <mock:when doc:name="Mock:ConnectorOperation:CreateCustomer" messageProcessor=".*:.*">
+            <mock:with-attributes>
+                <mock:with-attribute name="name" whereValue="ConnectorOperation:CreateCustomer"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[NullPayload.getInstance()]" mimeType="application/java"/>
+        </mock:when>
+        <munit:set payload="{ &quot;nameDetails&quot;: { &quot;salutation&quot;: &quot;Mr&quot; } }" mimeType="application/json" doc:name="SetMessage:SetInput">
+        </munit:set>
+        <flow-ref name="post:/customers:application:impl" doc:name="Flow-ref to post:/customers:application:impl"/>
+        <munit:assert-on-equals expectedValue="500" actualValue="#[message.outboundProperties['http.status']]" doc:name="Assert Equals"/>
+    </munit:test>
+</mule>

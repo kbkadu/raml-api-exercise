@@ -1,6 +1,6 @@
 #%RAML 1.0 Trait
 
-usage: Common Response type for update resource operation
+usage: Common Response type for get a resource operation
 
 uses:
   responseTypes: ../libraries/ResponseTypes.raml
@@ -9,8 +9,8 @@ responses:
   200:
     body:
       application/json:
-        type: responseTypes.UpdateResourceResType
-    description: Updated resource
+        type: <<getJsonType>>
+    description: Get a resource
   400:
     body:
       application/json:
@@ -29,5 +29,11 @@ responses:
   404:
     body:
       application/json:
-        type: responseTypes.ErrorResponseType
+        type: responseTypes.ErrorType
     description: Resource not found
+  500:
+    body:
+      application/json:
+        type: responseTypes.ErrorResponseType
+    description: Internal errors
+    

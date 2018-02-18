@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/apikit/current/mule-apikit.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+    <apikit:config name="Router" raml="customer-sys-api.raml" consoleEnabled="true" consolePath="/console" keepRamlBaseUri="false" doc:name="Router" />
+    <http:listener-config xmlns:http="http://www.mulesoft.org/schema/mule/http" name="customer-sys-api-httpListenerConfig" host="${http.host}" port="${http.private.port}" doc:name="HTTP Listener Configuration"/>
+    <apikit:config name="customer-sys-api-config" raml="customer-sys-api.raml" consoleEnabled="true" consolePath="/console" doc:name="Router" keepRamlBaseUri="false"/>
+    <flow name="customer-sys-api-main">
+        <http:listener xmlns:http="http://www.mulesoft.org/schema/mule/http" config-ref="customer-sys-api-httpListenerConfig" path="${http.basePath}" doc:name="HTTP"/>
+        <apikit:router config-ref="customer-sys-api-config" doc:name="APIkit Router"/>
+        <exception-strategy ref="common-exception-strategies:GlobalStrategy" doc:name="Reference Exception Strategy"/>
+    </flow>
+    <flow name="put:/customers/{id}:application/json:customer-sys-api-config">
+        <flow-ref name="put:/customers/{id}:application:impl" doc:name="put:/customers/{id}:application:impl"/>
+    </flow>
+    <flow name="delete:/customers/{id}:customer-sys-api-config">
+        <flow-ref name="delete:/customers/{id}:impl" doc:name="delete:/customers/{id}:impl"/>
+    </flow>
+    <flow name="get:/customers/{id}:customer-sys-api-config">
+        <flow-ref name="get:/customers/{id}:impl" doc:name="get:/customers/{id}:impl"/>
+    </flow>
+    <flow name="get:/customers:customer-sys-api-config">
+        <flow-ref name="get:/customers:impl" doc:name="get:/customers:impl"/>
+    </flow>
+    <flow name="post:/customers:application/json:customer-sys-api-config">
+        <flow-ref name="post:/customers:application:impl" doc:name="post:/customers:application:impl"/>
+    </flow>
+</mule>

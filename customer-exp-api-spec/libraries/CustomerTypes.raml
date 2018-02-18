@@ -1,0 +1,110 @@
+#%RAML 1.0 Library
+
+usage: Customer Types
+
+types:
+  GetCreateCustomerType:
+    displayName: Customer
+    description: Definition of the Customer Object
+    type: object
+    properties:
+      id:
+        type: string
+        displayName: UniqueId
+        description: Unique identifier for Customer record
+      firstName:
+        type: string
+        displayName: First Name
+        description: First name of the person
+      lastName:
+        type: string
+        displayName: Last Name
+        description: Last name of the person
+      street:
+        type: string
+        displayName: Address Line 1
+        description: Field indicating street address
+      city:
+        type: string
+        displayName: City
+        description: City of the address
+      state:
+        enum: [
+        ACT, #Australian Capital Territory
+        NSW, #New South Wales
+        NT, #Northern Territory
+        QLD, #Queensland
+        SA, #South Australia
+        TAS, #Tasmania
+        VIC, #Victoria
+        WA, #Western Australia
+        ]
+        displayName: State
+        description: State of the address
+      postalCode:
+        type: string
+        displayName: Postal Code
+        description: Postal code of the address
+      country:
+        enum: [
+        AU, #Australia
+        ]
+        displayName: Country Code
+        description: Country of the address
+      
+  UpdateCustomerType:
+    displayName: Customer
+    description: Definition of the Customer Object
+    type: object
+    properties:
+      id:
+        type: string
+        required: false
+        displayName: UniqueId
+        description: Unique identifier for Customer record
+      firstName:
+        type: string
+        required: false
+        displayName: First Name
+        description: First name of the person
+      lastName:
+        type: string
+        required: false
+        displayName: Last Name
+        description: Last name of the person
+      street:
+        type: string
+        required: false
+        displayName: Address Line 1
+        description: Field indicating street address
+      city:
+        type: string
+        required: false
+        displayName: City
+        description: City of the address
+      state:
+        enum: [
+        ACT, #Australian Capital Territory
+        NSW, #New South Wales
+        NT, #Northern Territory
+        QLD, #Queensland
+        SA, #South Australia
+        TAS, #Tasmania
+        VIC, #Victoria
+        WA, #Western Australia
+        ]
+        required: false
+        displayName: State
+        description: State of the address
+      postalCode:
+        type: string
+        required: false
+        displayName: Postal Code
+        description: Postal code of the address
+      country:
+        enum: [
+        AU, #Australia
+        ]
+        required: false
+        displayName: Country Code
+        description: Country of the address
