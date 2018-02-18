@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+    <ee:object-store-caching-strategy name="Caching_Strategy" keyGenerationExpression="#['customer-sor']" doc:name="Caching Strategy">
+        <in-memory-store/>
+    </ee:object-store-caching-strategy>
+    <flow name="ConnectorOperation:CreateCustomer">
+        <enricher doc:name="MessageEnricher:GetStoreRef" source="#[payload]" target="#[flowVars.storeRef]">
+		        <flow-ref name="inmem-customer-sor" doc:name="inmem-customer-sor"/>
+        </enricher>
+        <logger message="Before Created: #[payload]" level="INFO" doc:name="Logger"/>
+        <scripting:transformer doc:name="Groovy">
+            <scripting:script engine="Groovy"><![CDATA[id = "" + (flowVars.storeRef.size() + 1);
+payload.put("id", id);
+payload.put("isActive", true);
+flowVars.storeRef.put(id, payload);
+return payload;]]></scripting:script>
+        </scripting:transformer>
+        <logger message="After Created #[payload] and #[flowVars.storeRef]" level="INFO" doc:name="Logger"/>
+    </flow>
+    <flow name="ConnectorOperation:GetCustomers">
+        <choice doc:name="Choice">
+            <when expression="#[payload != null &amp;&amp; payload.id != null]">
+	        <enricher doc:name="MessageEnricher:GetStoreRef" source="#[payload]" target="#[flowVars.storeRef]">
+			        <flow-ref name="inmem-customer-sor" doc:name="inmem-customer-sor"/>
+	        </enricher>
+                <dw:transform-message doc:name="Transform Message">
+                    <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+(flowVars.storeRef filter ($.id == payload.id and $.isActive))[0] when (sizeOf (flowVars.storeRef filter ($.id == payload.id and $.isActive))) > 0 otherwise null]]></dw:set-payload>
+                </dw:transform-message>
+            </when>
+            <otherwise>
+                <flow-ref name="inmem-customer-sor" doc:name="inmem-customer-sor"/>
+                <dw:transform-message doc:name="Transform Message">
+                    <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+payload filter $.isActive]]></dw:set-payload>
+                </dw:transform-message>
+            </otherwise>
+        </choice>
+
+    </flow>    
+    <flow name="ConnectorOperation:UpdateCustomers">
+        <enricher doc:name="MessageEnricher:GetCustRef" source="#[payload]" target="#[flowVars.custRef]">
+	        <flow-ref name="ConnectorOperation:GetCustomers" doc:name="ConnectorOperation:GetCustomers"/>
+        </enricher>
+        <choice doc:name="Choice">
+            <when expression="#[flowVars.custRef != null]">
+                <enricher source="#[payload]" target="#[flowVars.storeRef]" doc:name="MessageEnricher:GetStoreRef">
+                    <flow-ref name="inmem-customer-sor" doc:name="inmem-customer-sor"/>
+                </enricher>
+                <dw:transform-message doc:name="Transform Message">
+                    <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+{
+	  id: flowVars.custRef.id, 
+      nameDetails: {
+	      salutation: payload.nameDetails.salutation when payload.nameDetails.salutation != null otherwise flowVars.custRef.nameDetails.salutation,
+	      prefix: payload.nameDetails.prefix when payload.nameDetails.prefix != null otherwise flowVars.custRef.nameDetails.prefix,
+	      firstName: payload.nameDetails.firstName when payload.nameDetails.firstName != null otherwise flowVars.custRef.nameDetails.firstName,
+	      middleName: payload.nameDetails.middleName when payload.nameDetails.middleName != null otherwise flowVars.custRef.nameDetails.middleName,
+	      lastName: payload.nameDetails.lastName when payload.nameDetails.lastName != null otherwise flowVars.custRef.nameDetails.lastName
+	   },
+      addressDetails: {
+          addressLine1: payload.addressDetails.addressLine1 when payload.addressDetails.addressLine1 != null otherwise flowVars.custRef.addressDetails.addressLine1,
+          addressLine2: payload.addressDetails.addressLine2 when payload.addressDetails.addressLine2 != null otherwise flowVars.custRef.addressDetails.addressLine2,
+          addressLine3: payload.addressDetails.addressLine3 when payload.addressDetails.addressLine3 != null otherwise flowVars.custRef.addressDetails.addressLine3,
+          addressLine4: payload.addressDetails.addressLine4 when payload.addressDetails.addressLine4 != null otherwise flowVars.custRef.addressDetails.addressLine4,
+          addressLine5: payload.addressDetails.addressLine5 when payload.addressDetails.addressLine5 != null otherwise flowVars.custRef.addressDetails.addressLine5,
+          cityDivision: payload.addressDetails.cityDivision when payload.addressDetails.cityDivision != null otherwise flowVars.custRef.addressDetails.cityDivision,
+          city: payload.addressDetails.city when payload.addressDetails.city != null otherwise flowVars.custRef.addressDetails.city,
+          state: payload.addressDetails.state when payload.addressDetails.state != null otherwise flowVars.custRef.addressDetails.state,
+          postalCode: payload.addressDetails.postalCode when payload.addressDetails.postalCode != null otherwise flowVars.custRef.addressDetails.postalCode,
+          country: payload.addressDetails.country when payload.addressDetails.country != null otherwise flowVars.custRef.addressDetails.country
+       },
+       isActive: flowVars.custRef.isActive
+  }
+      ]]></dw:set-payload>
+                </dw:transform-message>
+                <scripting:transformer doc:name="Groovy">
+                    <scripting:script engine="Groovy"><![CDATA[flowVars.storeRef.put(payload.id, payload);
+return payload;
+]]></scripting:script>
+                </scripting:transformer>
+            </when>
+            <otherwise>
+                <set-payload value="#[NullPayload.getInstance()]" mimeType="application/java" doc:name="Set Payload"/>
+            </otherwise>
+        </choice>
+    </flow>
+    <flow name="ConnectorOperation:DeleteCustomer">
+        <flow-ref name="ConnectorOperation:GetCustomers" doc:name="ConnectorOperation:GetCustomers"/>
+        <logger message="Got Cust: #[payload] and storRef #[flowVars.storeRef]" level="INFO" doc:name="Logger"/>
+        <choice doc:name="Choice">
+            <when expression="#[payload != null]">
+                <scripting:transformer doc:name="Groovy">
+                    <scripting:script engine="Groovy"><![CDATA[payload.put("isActive", false);
+flowVars.storeRef.put(payload.id, payload);
+return payload;
+]]></scripting:script>
+                </scripting:transformer>
+            </when>
+            <otherwise>
+                <logger message="Returning Null" level="INFO" doc:name="Logger"/>
+            </otherwise>
+        </choice>
+        <logger message="After Store STate: #[flowVars.storeRef]" level="INFO" doc:name="Logger"/>
+    </flow>
+    <sub-flow name="inmem-customer-sor">
+        <ee:cache cachingStrategy-ref="Caching_Strategy" doc:name="Cache">
+            <set-payload value="#[Thread.currentThread().getContextClassLoader().getResourceAsStream('CustomerList.xml')]" mimeType="application/xml" doc:name="SetPayload:LoadXmlFile"/>
+            <dw:transform-message doc:name="TransformMessage:ConvertToMap">
+                <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+
+payload.cusotmer-list.*customer mapObject {
+	($.id): {
+	  id: $.id, 
+      nameDetails: {
+	      salutation: $.salutation,
+	      prefix: $.prefix,
+	      firstName: $.firstName,
+	      middleName: $.middleName,
+	      lastName: $.lastName
+	   },
+      addressDetails: {
+          addressLine1: $.addressLine1,
+          addressLine2: $.addressLine2,
+          addressLine3: $.addressLine3,
+          addressLine4: $.addressLine4,
+          addressLine5: $.addressLine4,
+          cityDivision: $.cityDivision,
+          city: $.city,
+          state: $.state,
+          postalCode: $.postalCode,
+          country: $.country
+       },
+       isActive:true
+	}
+}]]></dw:set-payload>
+            </dw:transform-message>
+            <scripting:transformer mimeType="application/java" doc:name="Groovy:ConvertToConcurrentMap">
+                <scripting:script engine="Groovy"><![CDATA[store = new java.util.concurrent.ConcurrentHashMap();
+store.putAll(payload);
+return store;]]></scripting:script>
+            </scripting:transformer>
+        </ee:cache>
+    </sub-flow>
+</mule>

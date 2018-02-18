@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/apikit/current/mule-apikit.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+    <choice-exception-strategy name="common-exception-strategies:GlobalStrategy">
+        <catch-exception-strategy when="#[exception.causedBy(com.mulesoft.weave.mule.exception.WeaveExecutionException)]" doc:name="CatchDataWeaveException">
+        	<set-payload value="#[{ &quot;errors&quot;: [{ &quot;error&quot;: &quot;BAD REQUEST&quot;, &quot;errorMsg&quot;: exception.cause.message}]}]" mimeType="application/java" doc:name="SetPayload:SetBadRequest"/>
+            <flow-ref name="common-exception-strategies:global-badRequest-flow" doc:name="common-exception-strategies:global-badRequest-flow"/>
+        </catch-exception-strategy>
+        <apikit:mapping-exception-strategy doc:name="customer-sys-api-apiKitGlobalExceptionMapping">
+        <apikit:mapping statusCode="404">
+            <apikit:exception value="org.mule.module.apikit.exception.NotFoundException" />
+            <set-payload value="#[{ &quot;error&quot;: &quot;RESOURCE NOT FOUND&quot;, &quot;errorMsg&quot;: exception.cause.message}]" doc:name="SetPayload:SetNotFound" mimeType="application/java"/>
+            <flow-ref name="common-exception-strategies:global-resourceNotFound-flow" doc:name="common-exception-strategies:global-resourceNotFound-flow"/>
+        </apikit:mapping>
+        <apikit:mapping statusCode="405">
+            <apikit:exception value="org.mule.module.apikit.exception.MethodNotAllowedException" />
+            <set-payload value="#[{ &quot;error&quot;: &quot;METHOD NOT ALLOWED&quot;, &quot;errorMsg&quot;: exception.cause.message}]" doc:name="SetPayload:SetNotAllowed" mimeType="application/java"/>
+            <flow-ref name="common-exception-strategies:global-methodNotAllowed-flow" doc:name="common-exception-strategies:global-methodNotAllowed-flow"/>
+        </apikit:mapping>
+        <apikit:mapping statusCode="415">
+            <apikit:exception value="org.mule.module.apikit.exception.UnsupportedMediaTypeException" />
+            <set-payload value="#[{ &quot;error&quot;: &quot;NOT SUPPORTED&quot;, &quot;errorMsg&quot;: exception.cause.message}]" doc:name="SetPayload:SetUnsupported" mimeType="application/java"/>
+            <flow-ref name="common-exception-strategies:global-unsupportedMedia-flow" doc:name="common-exception-strategies:global-unsupportedMedia-flow"/>
+        </apikit:mapping>
+        <apikit:mapping statusCode="406">
+            <apikit:exception value="org.mule.module.apikit.exception.NotAcceptableException" />
+            <set-payload value="#[{ &quot;error&quot;: &quot;NOT ACCEPTABLE&quot;, &quot;errorMsg&quot;: exception.cause.message}]" doc:name="SetPayload:SetNotAcceptable" mimeType="application/java"/>
+            <flow-ref name="common-exception-strategies:global-notAcceptable-flow" doc:name="common-exception-strategies:global-notAcceptable-flow"/>
+        </apikit:mapping>
+        <apikit:mapping statusCode="400">
+            <apikit:exception value="org.mule.module.apikit.exception.BadRequestException" />
+                <set-payload value="#[{ &quot;errors&quot;: [{ &quot;error&quot;: &quot;BAD REQUEST&quot;, &quot;errorMsg&quot;: exception.cause.message}]}]" mimeType="application/java" doc:name="SetPayload:SetBadRequest"/>
+                <flow-ref name="common-exception-strategies:global-badRequest-flow" doc:name="common-exception-strategies:global-badRequest-flow"/>
+        </apikit:mapping>
+    </apikit:mapping-exception-strategy>
+    </choice-exception-strategy>
+    <sub-flow name="common-exception-strategies:global-badRequest-flow">
+        <set-property propertyName="http.status" value="400" doc:name="Property:400"/>
+        <dw:transform-message doc:name="TransformMessage:ConvertToJSON">
+            <dw:set-payload resource="classpath:dwl/payloadToJson.dwl"/>
+        </dw:transform-message>
+    </sub-flow>
+    <sub-flow name="common-exception-strategies:global-resourceNotFound-flow">
+        <set-property propertyName="http.status" value="404" doc:name="Property:404"/>
+        <dw:transform-message doc:name="TransformMessage:ConvertToJSON">
+            <dw:set-payload resource="classpath:dwl/payloadToJson.dwl"/>
+        </dw:transform-message>
+    </sub-flow>
+    <sub-flow name="common-exception-strategies:global-methodNotAllowed-flow">
+        <set-property propertyName="http.status" value="405" doc:name="Property:405"/>
+        <dw:transform-message doc:name="TransformMessage:ConvertToJSON">
+            <dw:set-payload resource="classpath:dwl/payloadToJson.dwl"/>
+        </dw:transform-message>
+    </sub-flow>
+    <sub-flow name="common-exception-strategies:global-notAcceptable-flow">
+        <set-property propertyName="http.status" value="406" doc:name="Property:406"/>
+        <dw:transform-message doc:name="TransformMessage:ConvertToJSON">
+            <dw:set-payload resource="classpath:dwl/payloadToJson.dwl"/>
+        </dw:transform-message>
+    </sub-flow>
+    <sub-flow name="common-exception-strategies:global-unsupportedMedia-flow">
+        <set-property propertyName="http.status" value="415" doc:name="Property:415"/>
+        <dw:transform-message doc:name="TransformMessage:ConvertToJSON">
+            <dw:set-payload resource="classpath:dwl/payloadToJson.dwl"/>
+        </dw:transform-message>
+    </sub-flow>
+    <sub-flow name="common-exception-strategies:global-intenalError-flow">
+        <set-property propertyName="http.status" value="500" doc:name="Property:500"/>
+        <dw:transform-message doc:name="TransformMessage:ConvertToJSON">
+            <dw:set-payload resource="classpath:dwl/payloadToJson.dwl"/>
+        </dw:transform-message>
+    </sub-flow>
+
+</mule>

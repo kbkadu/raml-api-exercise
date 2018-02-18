@@ -1,0 +1,28 @@
+<cusotmer-list>
+	<customer>
+		<id>1</id>
+        <salutation>Mr</salutation>
+         <prefix>Sr.</prefix>
+         <firstName>John</firstName>
+         <lastName>Doe</lastName>
+          <addressLine1>123 Blue Ave.</addressLine1>
+          <addressLine2>Suite 1</addressLine2>
+          <cityDivision>North</cityDivision>
+          <city>Sydney</city>
+          <state>NSW</state>
+          <postalCode>2055</postalCode>
+          <country>AU</country>
+	</customer>
+	<customer>
+		<id>2</id>
+        <salutation>Ms</salutation>
+         <firstName>Sarah</firstName>
+         <lastName>Marshall</lastName>
+          <addressLine1>707 Parkway</addressLine1>
+          <cityDivision>East</cityDivision>
+          <city>Melbourne</city>
+          <state>VIC</state>
+          <postalCode>3002</postalCode>
+          <country>AU</country>
+	</customer>	
+</cusotmer-list>

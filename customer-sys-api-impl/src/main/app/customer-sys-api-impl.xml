@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+    <flow name="put:/customers/{id}:application:impl">
+        <dw:transform-message doc:name="TransformMessage:SetUpdateInput">
+            <dw:set-payload resource="classpath:dwl/setCustPayload.dwl"/>
+        </dw:transform-message>
+        <flow-ref name="ConnectorOperation:UpdateCustomers" doc:name="ConnectorOperation:UpdateCustomers"/>
+        <choice doc:name="Choice:CheckConnectorResponse">
+            <when expression="#[payload != null]">
+                <dw:transform-message doc:name="TransformMessage:UpdateResponse">
+                    <dw:set-payload resource="classpath:dwl/updateResponse.dwl"/>
+                </dw:transform-message>
+            </when>
+            <otherwise>
+                <set-payload value="#[{ &quot;error&quot;: &quot;RESOURCE NOT FOUND&quot;, &quot;errorMsg&quot;: &quot;Resource identified with Id &quot; + flowVars.id + &quot; can't be found in system&quot; }]" mimeType="application/java" doc:name="SetPayload:SetResourceNotFoundError"/>
+                <flow-ref name="common-exception-strategies:global-resourceNotFound-flow" doc:name="common-exception-strategies:global-resourceNotFound-flow"/>
+            </otherwise>
+        </choice>
+    </flow>
+    <flow name="delete:/customers/{id}:impl">
+        <dw:transform-message doc:name="TransformMessage:SetDeleteId">
+            <dw:set-payload resource="classpath:dwl/setCustId.dwl"/>
+        </dw:transform-message>
+        <flow-ref name="ConnectorOperation:DeleteCustomer" doc:name="ConnectorOperation:DeleteCustomer"/>
+        <choice doc:name="Choice:CheckConnectorResponse">
+            <when expression="#[payload != null]">
+                <dw:transform-message doc:name="TransformMessage:SetDeleteResponse">
+                    <dw:set-payload resource="classpath:dwl/setDeleteResponse.dwl"/>
+                </dw:transform-message>
+            </when>
+            <otherwise>
+                <set-payload value="#[{ &quot;error&quot;: &quot;RESOURCE NOT FOUND&quot;, &quot;errorMsg&quot;: &quot;Resource identified with Id &quot; + flowVars.id + &quot; can't be found in system&quot; }]" mimeType="application/java" doc:name="SetPayload:SetResourceNotFoundError"/>
+                <flow-ref name="common-exception-strategies:global-resourceNotFound-flow" doc:name="common-exception-strategies:global-resourceNotFound-flow"/>
+            </otherwise>
+        </choice>
+    </flow>
+    <flow name="get:/customers/{id}:impl">
+        <dw:transform-message doc:name="TransformMessage:SetGetCustomerId">
+            <dw:set-payload resource="classpath:dwl/setCustId.dwl"/>
+        </dw:transform-message>
+        <flow-ref name="ConnectorOperation:GetCustomers" doc:name="ConnectorOperation:GetCustomers"/>
+        <choice doc:name="Choice:CheckConnectorResponse">
+            <when expression="#[payload != null]">
+                <dw:transform-message doc:name="TransformMessage:SetGetCustomerResponse">
+                    <dw:set-payload resource="classpath:dwl/setCustResponse.dwl"/>
+                </dw:transform-message>
+            </when>
+            <otherwise>
+                <set-payload value="#[{ &quot;error&quot;: &quot;RESOURCE NOT FOUND&quot;, &quot;errorMsg&quot;: &quot;Resource identified with Id &quot; + flowVars.id + &quot; can't be found in system&quot; }]" mimeType="application/java" doc:name="SetPayload:SetResourceNotFoundError"/>
+                <flow-ref name="common-exception-strategies:global-resourceNotFound-flow" doc:name="common-exception-strategies:global-resourceNotFound-flow"/>
+            </otherwise>
+        </choice>
+    </flow>
+    <flow name="get:/customers:impl">
+        <flow-ref name="ConnectorOperation:GetCustomers" doc:name="ConnectorOperation:GetCustomers"/>
+        <dw:transform-message doc:name="TransformMessage:CustomersListResponse">
+            <dw:set-payload resource="classpath:dwl/setCustomersResponse.dwl"/>
+        </dw:transform-message>        
+    </flow>
+    <flow name="post:/customers:application:impl">
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload resource="classpath:dwl/setCustPayload.dwl"/>
+        </dw:transform-message>
+        <flow-ref name="ConnectorOperation:CreateCustomer" doc:name="ConnectorOperation:CreateCustomer"/>
+        <choice doc:name="Choice:CheckConnectorResponse">
+            <when expression="#[payload != null &amp;&amp; payload.id != null]">
+                <set-property propertyName="#['http.status']" value="201" doc:name="Property:201"/>
+                <set-payload value="{ &quot;uniqueId&quot;: &quot;#[payload.id]&quot;, &quot;statusMsg&quot;: &quot;New Customer added to the system successfully&quot; }" mimeType="application/json" doc:name="SetPayload:SetSuccessResponse"/>
+            </when>
+            <otherwise>
+                <set-payload value="#[{&quot;errors&quot;: [{ &quot;error&quot;: &quot;UNKNOWN INTERNAL ERROR&quot;, &quot;errorMsg&quot;: &quot;Something went worng, Cloud not process the transaction&quot;}]}]" mimeType="application/java" doc:name="SetPayload:SetInternalError"/>
+                <flow-ref name="common-exception-strategies:global-intenalError-flow" doc:name="common-exception-strategies:global-intenalError-flow"/>
+            </otherwise>
+        </choice>
+    </flow>
+</mule>

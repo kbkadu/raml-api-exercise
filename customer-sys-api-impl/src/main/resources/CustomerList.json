@@ -1,0 +1,36 @@
+[
+	{
+      "id": "1",
+      "nameDetails": {
+          "salutation": "Mr.",
+          "prefix": "Sr.",
+          "firstName": "John",
+          "lastName": "Doe"
+      },
+      "addressDetails": {
+          "addressLine1": "123 Blue Ave.",
+          "addressLine2": "Suite 1",
+          "cityDivision": "North",
+          "city": "Sydney",
+          "state": "NSW",
+          "postalCode": "2055",
+          "country": "AU"
+       }
+	},
+	{
+      "id": "2",
+      "nameDetails": {
+          "salutation": "Ms.",
+          "firstName": "Sarah",
+          "lastName": "Marshall"
+      },
+      "addressDetails": {
+          "addressLine1": "707 Parkway",
+          "cityDivision": "East",
+          "city": "Melbourne",
+          "state": "VIC",
+          "postalCode": "3002",
+          "country": "AU"
+       }
+	}
+]

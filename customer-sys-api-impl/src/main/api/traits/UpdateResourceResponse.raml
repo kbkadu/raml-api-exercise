@@ -1,0 +1,33 @@
+#%RAML 1.0 Trait
+
+usage: Common Response type for update resource operation
+
+uses:
+  responseTypes: ../libraries/ResponseTypes.raml
+
+responses:
+  200:
+    body:
+      application/json:
+        type: responseTypes.UpdateResourceResType
+    description: Updated resource
+  400:
+    body:
+      application/json:
+        type: responseTypes.ErrorResponseType
+    description: Invalid input data
+  401:
+    body:
+      application/json:
+        type: responseTypes.ErrorType
+    description: Unathorize action
+  403:
+    body:
+      application/json:
+        type: responseTypes.ErrorType
+    description: Forbidden action
+  404:
+    body:
+      application/json:
+        type: responseTypes.ErrorResponseType
+    description: Resource not found

@@ -1,0 +1,78 @@
+#%RAML 1.0 Library
+
+usage: Common response type
+
+types:    
+  CreateResourceResType:
+    displayName: Create Resource Response (POST)
+    description: Standard response for create new Resource (POST) operation
+    type: object
+    properties:
+      uniqueId:
+        type: string
+        displayName: UniqueId
+        description: Unique Id of the <<resource>> created
+      statusMsg:
+        type: string
+        displayName: Status
+        description: Operational message about creation process status
+    example: { "uniqueId": "AB1234", "statusMsg": "Resource created successfully" }
+
+  UpdateResourceResType:
+    type: object
+    displayName: Update Resource Response (PUT)
+    description: Standard response for updating a existing Resource (PUT) operation
+    properties:
+      uniqueId:
+        type: string
+        displayName: UniqueId
+        description: Unique Id of the <<resource>> updated
+      statusMsg:
+        type: string
+        displayName: Status
+        description: Operational message about update process status
+    example: { "uniqueId": "AB1234", "statusMsg": "Resource updated successfully" }
+
+  DeleteResourceResType:
+    type: object
+    displayName: Delete Resource Response (PUT)
+    description: Standard response for deleting a existing Resource (DELETE) operation
+    properties:
+      uniqueId:
+        type: string
+        displayName: UniqueId
+        description: Unique Id of the <<resource>> deleted
+      statusMsg:
+        type: string
+        displayName: Status
+        description: Operational message about delete process status
+    example: { "uniqueId": "AB1234", "statusMsg": "Resource deleted successfully" }
+
+  ErrorResponseType:
+    type: object
+    displayName: Error List Response
+    description: List of errors for given resource operation.
+    properties:
+      errors:
+        type: array
+        items: ErrorType
+        minItems: 1
+        displayName: Error List
+        description: List of the errors
+    example: { errors: [{ "error": "INVALID VALUE RANGE", "errorMsg": "Date period can't be more than 6 months"}, { "error": "INVALID VALUE", "errorMsg": "PO number can't be null" }] }
+
+
+  ErrorType:
+    type: object
+    displayName: Error Response
+    description: Error for a given operation
+    properties:
+      error:
+        type: string
+        displayName: Error
+        description: Error code or short error message
+      errorMsg:
+        type: string
+        displayName: Error Message
+        description: Detail Error message or summary
+    example: { "error": "RESOURCE NOT FOUND", "errorMsg": "Resource identified with Id 1215mwersd can't be found in system" }
