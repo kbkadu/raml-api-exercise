@@ -1,4 +1,4 @@
-# RAML API Models As An Exercise Around Customer API
+# RAML API Modelling Exercise
 This repository contains the RAMLs for Customer APIs. These APIs are designed using APILed Connectivity Pattern to meet objectives as follows.
 
 ## Objective
@@ -16,9 +16,10 @@ The API-led Connectivity is layered API Pattern where APIs are designed with one
 Applying API-led with purity always comes with tread-off of complexity and inefficient inter process communication. Another alternative to apply this pattern is to evaluate if each layer and evaluate if it provides the necessary benefits without worrying about cross layer communications.
 
 With this consideration we will model the APIs in System and Experience layer for stated objective. This will allow good enough flexibility while still having a flexible design.
+
 ![Solution Design](images/Solution.jpg?raw=true "Solution Design")
 
-Diagram about depicts the 2 APIs and the communication model with respective to API consumer.
+Diagram above depicts the 2 APIs and the communication model with respective to API consumer.
 
 ## Anatomy Of The Designed APIs
 ### Customer System API
@@ -74,27 +75,33 @@ While system API provides the basic Create, Read, Edit and Delete capability on 
 #### Allow consumer to call APIs every 5 min and get copy of the Customer records
 The System API provide the underline necessary GET resource which retrieves the list of customer from System Of Records. However retrieving all the records will be very expensive operation. A time period filter expressed using from and to timestamp query parameter has been added to that only the records updating in this time period will be retrieved.
 The the network communication for this use case is shown in below diagram.
+
 ![Use Case 1](images/UC1.jpg?raw=true "Use Case 1")
+
 The API consumer will use Experience API GET "/customers/updatedInlast5min" resource to get the customer records modified in last 5 min. While consumer could have call the System API directly with time period filter doing so will means consumer will have to adapt to the System API model and it's complexity. Experience API provdes the simplified data model as required by consumer with direct resource "/customers/updatedInlast5min" which cloud fulfils this requirement.
 
 #### Allow consumer (Mobile App) to call APIs and retrieve, update Customer records
 While System API provides RESTFul resource for retrieving and updating customers, it will add complexity on consumer side to
 adapt the system API model as well have having to deal with the generic resources provided by System API.
 The API interaction for this use case is as per the diagram below.
+
 ![Use Case 2](images/UC2.jpg?raw=true "Use Case 2")
+
 The Mobile app will use the GET "/customer/{id}" resource to retrieve details of particular Customer.
 The mobile app will use PUT "/customer/{id}" on Experience API to update multiple fields of a customer records. For both the functions, Experience API will use the underline System API resources with necessary transformation of data model.
 The Experience API also offer a PATCH "/customer/{id}/{fieldName}" for Mobile app to quick update single field, The Experience API take cares of translating into System API PUT "/customer/{id}/" call.
 
 #### Allow extension of the APIs to support Orders and Products
+
 ![Use Case 3](images/UC3.jpg?raw=true "Use Case 3")
+
 Orders and Products resource will be incorporated into the Experience API with two main functional context
 * Create/Get Order history for a particular customer, Get Product recommendations/wishList for particular customer.
-The Experience API cloud have resource like "/customers/{id}/orders" with necessary filters to retrieve Order of particular Customer. Such capability need to be supported by underline Order System API which could interface with the Order Management System.
+The Experience API cloud have resource like "/customers/{id}/orders" with necessary filters to retrieve Order of particular Customer. Such capability need to be supported by underline Order Process and System API which could interface with the Order Management System.
 For Products "/customers/{id}/products/wishList" and "/customers/{id}/products/recommendations" can retrieve Product. These capability will come from the Recommendations process API.
 
 * Get Product
-Experience API can also have GET "/products" resource to get available Products
+Experience API can also have GET "/products" resource to get available Products using Product System API.
 
 ## Further Improvements
 ### Add pagination
@@ -102,3 +109,4 @@ The GET "customers" even with period cloud return large list of Customer records
 
 ### Single Experience API
 For all the above use cases we have assume that is a same API consumer and thus designed single Experience API. But separate Experience API for each consumer can enable faster rate of change than having a common Experience API between multiple API consumer.
+
