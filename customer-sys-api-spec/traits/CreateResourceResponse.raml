@@ -26,3 +26,9 @@ responses:
       application/json:
         type: responseTypes.ErrorType
     description: Forbidden action
+  500:
+    body:
+      application/json:
+        type: responseTypes.ErrorResponseType
+    description: Internal errors
+    
