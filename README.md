@@ -44,22 +44,22 @@ The Complete spec of the design is at https://github.com/kishkadu/raml-api-exerc
 #### Implementation Details 
 The implementation of the API uses an inmemory System Of Records storage. The RESTful Operation allows Retrieving, Creating, Updating and deleting of the records in this storage. The storage does not have a persistence abilities and data is lost when the APIs is restarted. During startup APIs loads 2 records from the files. 
 The implementation is at https://github.com/kishkadu/raml-api-exercise/tree/master/customer-sys-api-impl
-* customer-sys-api.xml
+#### customer-sys-api.xml
   This the auto generated file from the RAML specification using Anypoint studio. The APIRouterKit component hosted in this file routes the call the corresponding flows for each REST resource operation.
 
-* customer-sys-api-impl.xml
+#### customer-sys-api-impl.xml
   While the customer-sys-api.xml is auto generated from RAML and has only placeholder for the resource flows. The actual implementations of the flows are constructed in this file. This separation allows us to regenerate customer-sys-api.xml from RAML if there are any updates to RAML. 
  
-* inmem-customer-sor-provider.xml
+#### inmem-customer-sor-provider.xml
   This is the file, which has implementation of the Inmemory System Of Records for Customer data. To simulate the Connector and its Operations, the flows are implemented for particular operation. API implementation flow in customer-sys-api-impl.xml using the flow reference as in if it would use a connector to connect to the external system.
   
-* common-exception-strategies.xml
+#### common-exception-strategies.xml
   Global exception strategies which can be leverage by any flow are implanted in this files. The strategies are referenced by APIRouterKit flow to handle all the exceptions of API operations.
   
-* common-config.xml
+#### common-config.xml
   Configurations (Such as connector config, properties ref) are placed under this common config file.
   
-* customer-sys-api-impl-test-suite.xml
+#### customer-sys-api-impl-test-suite.xml
   Unit test cases corresponding to the each API operation covering all the possible routes in the flow is implemented in in this test suite file. The cover the flows from customer-sys-api-impl.xml and not from customer-sys-api.xml since the later is auto generated using RAML.
 
 ### Customer Experience API
